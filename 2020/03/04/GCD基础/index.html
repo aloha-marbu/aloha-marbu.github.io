@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="Dispatch通过提交工作以分派系统管理的队列，在多核硬件上同时执行代码。 队列和任务DispatchQueue：用于管理各线程上队列的对象。  main：主线程上的调度队列123DispatchQueue.main.async &amp;#123;     &#x2F;&#x2F; 回到主线程&amp;#125; global(qos: DispatchQoS.QoSClass) -&gt; Dispatch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GCD基础">
+<meta property="og:url" content="http://yoursite.com/2020/03/04/GCD%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="Aloha Marbu">
+<meta property="og:description" content="Dispatch通过提交工作以分派系统管理的队列，在多核硬件上同时执行代码。 队列和任务DispatchQueue：用于管理各线程上队列的对象。  main：主线程上的调度队列123DispatchQueue.main.async &amp;#123;     &#x2F;&#x2F; 回到主线程&amp;#125; global(qos: DispatchQoS.QoSClass) -&gt; Dispatch">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-03-04T03:54:05.000Z">
+<meta property="article:modified_time" content="2020-03-06T06:57:13.273Z">
+<meta property="article:author" content="Ma QianZheng">
+<meta property="article:tag" content="GCD 多线程 iOS">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>GCD基础</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+      
+<link rel="stylesheet" href="/css/rtl.css">
+
+    
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">文章</a></li>
+         
+          <li><a href="https://github.com/aloha-marbu" target="_blank" rel="noopener">项目</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/2020/03/01/hello-hexo/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2020/03/04/GCD%E5%9F%BA%E7%A1%80/" target="_blank" rel="noopener"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2020/03/04/GCD%E5%9F%BA%E7%A1%80/&text=GCD基础" target="_blank" rel="noopener"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2020/03/04/GCD%E5%9F%BA%E7%A1%80/&title=GCD基础" target="_blank" rel="noopener"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2020/03/04/GCD%E5%9F%BA%E7%A1%80/&is_video=false&description=GCD基础" target="_blank" rel="noopener"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=GCD基础&body=Check out this article: http://yoursite.com/2020/03/04/GCD%E5%9F%BA%E7%A1%80/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2020/03/04/GCD%E5%9F%BA%E7%A1%80/&title=GCD基础" target="_blank" rel="noopener"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2020/03/04/GCD%E5%9F%BA%E7%A1%80/&title=GCD基础" target="_blank" rel="noopener"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2020/03/04/GCD%E5%9F%BA%E7%A1%80/&title=GCD基础" target="_blank" rel="noopener"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2020/03/04/GCD%E5%9F%BA%E7%A1%80/&title=GCD基础" target="_blank" rel="noopener"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2020/03/04/GCD%E5%9F%BA%E7%A1%80/&name=GCD基础&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://yoursite.com/2020/03/04/GCD%E5%9F%BA%E7%A1%80/&t=GCD基础" target="_blank" rel="noopener"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Dispatch"><span class="toc-number">1.</span> <span class="toc-text">Dispatch</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#队列和任务"><span class="toc-number">1.0.1.</span> <span class="toc-text">队列和任务</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#优先级"><span class="toc-number">1.0.2.</span> <span class="toc-text">优先级</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#系统事件监控"><span class="toc-number">1.0.3.</span> <span class="toc-text">系统事件监控</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#任务同步"><span class="toc-number">1.0.4.</span> <span class="toc-text">任务同步</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#时间构造"><span class="toc-number">1.0.5.</span> <span class="toc-text">时间构造</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#调度对象"><span class="toc-number">1.0.6.</span> <span class="toc-text">调度对象</span></a></li></ol></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        GCD基础
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Aloha Marbu</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-03-04T03:54:05.000Z" itemprop="datePublished">2020-03-04</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/GCD-%E5%A4%9A%E7%BA%BF%E7%A8%8B-iOS/" rel="tag">GCD 多线程 iOS</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h2 id="Dispatch"><a href="#Dispatch" class="headerlink" title="Dispatch"></a>Dispatch</h2><p>通过提交工作以分派系统管理的队列，在多核硬件上同时执行代码。</p>
+<h4 id="队列和任务"><a href="#队列和任务" class="headerlink" title="队列和任务"></a>队列和任务</h4><p><a href="https://developer.apple.com/documentation/dispatch/dispatchqueue" target="_blank" rel="noopener">DispatchQueue</a>：用于管理各线程上队列的对象。</p>
+<ul>
+<li><a href="https://developer.apple.com/documentation/dispatch/dispatchqueue/1781006-main" target="_blank" rel="noopener">main</a>：主线程上的调度队列<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">DispatchQueue.main.async &#123; </span><br><span class="line">    &#x2F;&#x2F; 回到主线程</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><a href="https://developer.apple.com/documentation/dispatch/dispatchqueue/2300077-global" target="_blank" rel="noopener">global(qos: DispatchQoS.QoSClass) -&gt; DispatchQueue</a>：返回具有指定优先级的全局系统队列。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">let queue &#x3D; DispatchQueue.global(qos: .default)</span><br><span class="line">queue.async &#123;</span><br><span class="line">    &#x2F;&#x2F; 异步执行（子线程）</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">queue.sync &#123; </span><br><span class="line">    &#x2F;&#x2F; 同步执行（主线程）</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><a href="https://developer.apple.com/documentation/dispatch/dispatchqueue/2300059-init" target="_blank" rel="noopener">init(label: String, qos: DispatchQoS = .unspecified, attributes: DispatchQueue.Attributes = [], autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency = .inherit, target: DispatchQueue? = nil)</a>：创建一个新的调度队列<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">let queue &#x3D; DispatchQueue(label: &quot;cn.marbu.demo&quot;, qos: .unspecified, attributes: [], autoreleaseFrequency: .inherit, target: nil)</span><br><span class="line">queue.async &#123;</span><br><span class="line">    &#x2F;&#x2F; 异步执行（子线程）</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">queue.sync &#123; </span><br><span class="line">    &#x2F;&#x2F; 同步执行（主线程）</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>异步执行任务</p>
+<ul>
+<li>async<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">let queue &#x3D; DispatchQueue(label: &quot;cn.marbu.demo&quot;)</span><br><span class="line">queue.async &#123;</span><br><span class="line">    &#x2F;&#x2F; 异步执行</span><br><span class="line">&#125;</span><br><span class="line">queue.asyncAfter(deadline: .now() + 1) &#123;</span><br><span class="line">    &#x2F;&#x2F; 延迟1秒异步执行</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>同步执行任务</p>
+<ul>
+<li>sync<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">let queue &#x3D; DispatchQueue(label: &quot;cn.marbu.demo&quot;)</span><br><span class="line">queue.sync &#123; </span><br><span class="line">    &#x2F;&#x2F; 同步执行	</span><br><span class="line">&#125;</span><br><span class="line">let result &#x3D; queue.sync &#123;</span><br><span class="line">    &#x2F;&#x2F; 同步执行</span><br><span class="line">    return &quot;Result&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p><a href="https://developer.apple.com/documentation/dispatch/dispatchworkitem" target="_blank" rel="noopener">DispatchWorkItem</a>：封装想要执行的工作，可以附加完成句柄或执行依赖项。</p>
+<ul>
+<li>初始化和应用<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">let workItem &#x3D; DispatchWorkItem &#123;</span><br><span class="line">    &#x2F;&#x2F; Work</span><br><span class="line">&#125;</span><br><span class="line">queue.async(execute: workItem)</span><br><span class="line"></span><br><span class="line">let workItem1 &#x3D; DispatchWorkItem(qos: .default, flags: []) &#123;</span><br><span class="line">    &#x2F;&#x2F; Work</span><br><span class="line">&#125;</span><br><span class="line">queue1.async(execute: workItem1)</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p><a href="https://developer.apple.com/documentation/dispatch/dispatchgroup" target="_blank" rel="noopener">DispatchGroup</a>：作为一个单元，监视一组任务。当所有工作项完成执行时，将执行其完成处理程序。也可以同步等待组中的所有任务完成执行。</p>
+<ul>
+<li>notify（一组任务完成时处理程序）<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">let group &#x3D; DispatchGroup()</span><br><span class="line">let queue &#x3D; DispatchQueue(label: &quot;cn.marbu.demo&quot;)</span><br><span class="line"></span><br><span class="line">group.enter()</span><br><span class="line">queue.async &#123;</span><br><span class="line">    &#x2F;&#x2F; Work1...</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; Work1结束</span><br><span class="line">    group.leave()</span><br><span class="line"> &#125;</span><br><span class="line">        </span><br><span class="line">group.enter()</span><br><span class="line">queue.async &#123;</span><br><span class="line">    &#x2F;&#x2F; Work2...</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; Work2结束</span><br><span class="line">    group.leave()</span><br><span class="line">&#125;</span><br><span class="line">        </span><br><span class="line">group.notify(queue: queue) &#123;</span><br><span class="line">    &#x2F;&#x2F; Work1和Work2已全部结束</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h4 id="优先级"><a href="#优先级" class="headerlink" title="优先级"></a>优先级</h4><p><a href="https://developer.apple.com/documentation/dispatch/dispatchqos" target="_blank" rel="noopener">DispatchQoS</a>：指定任务优先级，高优先级的工作会比低优先级的工作执行的更快。</p>
+<ul>
+<li><a href="https://developer.apple.com/documentation/dispatch/dispatchqos/1780708-userinteractive" target="_blank" rel="noopener">userInteractive</a>：用户交互任务（例如动画，事件处理或更新应用程序的用户界面）类，与主线程优先级一致，优先级最高。</li>
+<li><a href="https://developer.apple.com/documentation/dispatch/dispatchqos/1780759-userinitiated" target="_blank" rel="noopener">userInitiated</a>：用户积极使用您的应用的任务类，优先级第二。</li>
+<li><a href="https://developer.apple.com/documentation/dispatch/dispatchqos/2016062-default" target="_blank" rel="noopener">default</a>：默认类，优先级第三。</li>
+<li><a href="https://developer.apple.com/documentation/dispatch/dispatchqos/1780791-utility" target="_blank" rel="noopener">utility</a>：用户未主动跟踪的任务类，优先级第四。</li>
+<li><a href="https://developer.apple.com/documentation/dispatch/dispatchqos/1780981-background" target="_blank" rel="noopener">background</a>：维护或清除任务类，优先级第五。</li>
+<li><a href="https://developer.apple.com/documentation/dispatch/dispatchqos/1780703-unspecified" target="_blank" rel="noopener">unspecified</a>：没有质量类，优先级最低。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">let queue &#x3D; DispatchQueue(label: &quot;cn.marbu.demo&quot;, qos: .default)</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h4 id="系统事件监控"><a href="#系统事件监控" class="headerlink" title="系统事件监控"></a>系统事件监控</h4><p><a href="https://developer.apple.com/documentation/dispatch/dispatchsource" target="_blank" rel="noopener">DispatchSource</a>：协调特定低级系统事件（例如文件系统事件，计时器和UNIX信号）的处理的对象。<br><a href="https://developer.apple.com/documentation/dispatch/dispatchio" target="_blank" rel="noopener">DispatchIO</a>：使用基于流或随机访问的语义管理文件描述符上的操作的对象。<br><a href="https://developer.apple.com/documentation/dispatch/dispatchdata" target="_blank" rel="noopener">DispatchData</a>：一个对象，该对象管理基于内存的数据缓冲区，并将其公开为连续的内存块。<br><a href="https://developer.apple.com/documentation/dispatch/dispatchdataiterator" target="_blank" rel="noopener">DispatchDataIterator</a>：调度数据对象内容上的逐字节迭代器。</p>
+<h4 id="任务同步"><a href="#任务同步" class="headerlink" title="任务同步"></a>任务同步</h4><p><a href="https://developer.apple.com/documentation/dispatch/dispatchsemaphore" target="_blank" rel="noopener">DispatchSemaphore</a>：通过使用传统的计数信号量来控制跨多个执行上下文对资源的访问的对象。</p>
+<h4 id="时间构造"><a href="#时间构造" class="headerlink" title="时间构造"></a>时间构造</h4><p><a href="https://developer.apple.com/documentation/dispatch/dispatchtime" target="_blank" rel="noopener">DispatchTime</a>：相对于默认时钟的时间点，具有纳秒精度。<br><a href="https://developer.apple.com/documentation/dispatch/dispatchwalltime" target="_blank" rel="noopener">DispatchWallTime</a>：根据壁钟的绝对时间点，以微秒为单位。<br><a href="https://developer.apple.com/documentation/dispatch/dispatchtimeinterval" target="_blank" rel="noopener">DispatchTimeInterval</a>：数秒，毫秒，微秒或纳秒。<br><a href="https://developer.apple.com/documentation/dispatch/dispatchtimeoutresult" target="_blank" rel="noopener">DispatchTimeoutResult</a>：结果值，指示调度操作是否在指定时间之前完成。<br><a href="https://developer.apple.com/documentation/dispatch/dispatch_time_t" target="_blank" rel="noopener">dispatch_time_t</a>：时间别名。<br><a href="https://developer.apple.com/documentation/dispatch/dispatch_walltime_now" target="_blank" rel="noopener">DISPATCH_WALLTIME_NOW</a>：当前时间。</p>
+<h4 id="调度对象"><a href="#调度对象" class="headerlink" title="调度对象"></a>调度对象</h4><p><a href="https://developer.apple.com/documentation/dispatch/dispatchobject" target="_blank" rel="noopener">DispatchObject</a>：大多数调度类型的基类。<br><a href="https://developer.apple.com/documentation/dispatch/dispatchpredicate" target="_blank" rel="noopener">DispatchPredicate</a>：在给定执行上下文中进行评估的逻辑条件。<br><a href="https://developer.apple.com/documentation/dispatch/1780605-dispatchprecondition" target="_blank" rel="noopener">dispatchPrecondition(condition: () -&gt; DispatchPredicate)</a>：检查进一步执行所需的调度条件。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">文章</a></li>
+         
+          <li><a href="https://github.com/aloha-marbu" target="_blank" rel="noopener">项目</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Dispatch"><span class="toc-number">1.</span> <span class="toc-text">Dispatch</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#队列和任务"><span class="toc-number">1.0.1.</span> <span class="toc-text">队列和任务</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#优先级"><span class="toc-number">1.0.2.</span> <span class="toc-text">优先级</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#系统事件监控"><span class="toc-number">1.0.3.</span> <span class="toc-text">系统事件监控</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#任务同步"><span class="toc-number">1.0.4.</span> <span class="toc-text">任务同步</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#时间构造"><span class="toc-number">1.0.5.</span> <span class="toc-text">时间构造</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#调度对象"><span class="toc-number">1.0.6.</span> <span class="toc-text">调度对象</span></a></li></ol></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2020/03/04/GCD%E5%9F%BA%E7%A1%80/" target="_blank" rel="noopener"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2020/03/04/GCD%E5%9F%BA%E7%A1%80/&text=GCD基础" target="_blank" rel="noopener"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2020/03/04/GCD%E5%9F%BA%E7%A1%80/&title=GCD基础" target="_blank" rel="noopener"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2020/03/04/GCD%E5%9F%BA%E7%A1%80/&is_video=false&description=GCD基础" target="_blank" rel="noopener"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=GCD基础&body=Check out this article: http://yoursite.com/2020/03/04/GCD%E5%9F%BA%E7%A1%80/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2020/03/04/GCD%E5%9F%BA%E7%A1%80/&title=GCD基础" target="_blank" rel="noopener"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2020/03/04/GCD%E5%9F%BA%E7%A1%80/&title=GCD基础" target="_blank" rel="noopener"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2020/03/04/GCD%E5%9F%BA%E7%A1%80/&title=GCD基础" target="_blank" rel="noopener"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2020/03/04/GCD%E5%9F%BA%E7%A1%80/&title=GCD基础" target="_blank" rel="noopener"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2020/03/04/GCD%E5%9F%BA%E7%A1%80/&name=GCD基础&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://yoursite.com/2020/03/04/GCD%E5%9F%BA%E7%A1%80/&t=GCD基础" target="_blank" rel="noopener"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2020 Ma QianZheng
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">文章</a></li>
+         
+          <li><a href="https://github.com/aloha-marbu" target="_blank" rel="noopener">项目</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css">
+
+
+    <!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+
+<!-- clipboard -->
+
+  
+<script src="/lib/clipboard/clipboard.min.js"></script>
+
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>
