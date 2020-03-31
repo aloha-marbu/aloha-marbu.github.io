@@ -4,7 +4,7 @@
 
 # Site
 title: Aloha Marbu
-subtitle: '抹布 画布 哪个不~'
+subtitle: '抹布 画布 哪个布~'
 description: '给文明以岁月，给岁月以文明'
 keywords: 马乾征 iOS
 author: Ma QianZheng
@@ -41,7 +41,7 @@ external_link:
   exclude: ''
 filename_case: 0
 render_drafts: false
-post_asset_folder: false
+post_asset_folder: true
 relative_link: false
 future: true
 highlight:
