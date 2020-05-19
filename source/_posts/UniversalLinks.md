@@ -38,15 +38,15 @@ tags: UniversalLinks iOS
     4. 除了用于匹配任何子字符串之外，您还可以?用于匹配任何单个字符。您可以将两个通配符合并在一个路径中，例如/foo//bar/201?/mypage。
     5. 路径字符串的开头添加NOT指定不应作为通用链接处理的区域，例如"paths": [ "/videos/wwdc/201?/" , "NOT /videos/wwdc/2010/"]
 
-比如你`Team ID`是`ASDFG12345`，`Bundle ID`是`com.yunchang.game`，只在
-访问`https://www.yunchang.com/app/`链接时才显示顶部的用app打开，其他网站层次不显示，那么这个文件的内容就是
+比如你`Team ID`是`ASDFG12345`，`Bundle ID`是`com.marbu.blog`，只在
+访问`https://www.aloha-marbu.com/app/`链接时才显示顶部的用app打开，其他网站层次不显示，那么这个文件的内容就是
 ```
 {
     "applinks": {
         "apps": [],
         "details": [
             {
-                "appID": "ASDFG12345.com.yunchang.game",
+                "appID": "ASDFG12345.com.marbu.blog",
                 "paths": [ "/app/*"]
             }
         ]
@@ -56,7 +56,7 @@ tags: UniversalLinks iOS
 然后将这个文件上传到网站根目录，或者在根目录新建一个名字为`.well-known`的子目录，然后把这个文件上传到这个子目录中。**注意：网站域名必须支持https**
 
 #### 2.网站验证
-上传之后，可以访问[https://search.developer.apple.com/appsearch-validation-tool/](https://search.developer.apple.com/appsearch-validation-tool/)，苹果专门提供的验证工具，然后将域名网址填进去，例如`www.yunchang.com/`，然后点击测试。
+上传之后，可以访问[https://search.developer.apple.com/appsearch-validation-tool/](https://search.developer.apple.com/appsearch-validation-tool/)，苹果专门提供的验证工具，然后将域名网址填进去，例如`www.aloha-marbu.com/`，然后点击测试。
 
 ![](applevalidation.png)
 
@@ -67,11 +67,11 @@ tags: UniversalLinks iOS
 ![](xcodeassociateddomains.png)
 2. 添加网站域名
 
-网站域名以`applinks:`开头，后面是你放`apple-app-site-association`文件的域名，比如：`applinks:www.yunchang.com`
+网站域名以`applinks:`开头，后面是你放`apple-app-site-association`文件的域名，比如：`applinks:www.aloha-marbu.com`
 
 ## 四、测试
 一切配置完成之后，删除你的`App`（只有删除重装Apple才会从你的服务器请求你的配置文件）
-在`Safari`中打开`域名/配置的path`，拿之前的例子就应该是`https://www.yunchang.com/app/`，然后页面往下拉，如果有有你`App`跳转相关信息，那么恭喜你成功了，没有也不要慌，确认配置无误的话，等一会再试试。
+在`Safari`中打开`域名/配置的path`，拿之前的例子就应该是`https://www.aloha-marbu.com/app/`，然后页面往下拉，如果有有你`App`跳转相关信息，那么恭喜你成功了，没有也不要慌，确认配置无误的话，等一会再试试。
 
 
 
