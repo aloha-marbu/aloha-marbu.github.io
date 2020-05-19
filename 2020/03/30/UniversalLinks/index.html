@@ -17,7 +17,7 @@
 <meta property="og:image" content="http://yoursite.com/2020/03/30/UniversalLinks/applevalidation.png">
 <meta property="og:image" content="http://yoursite.com/2020/03/30/UniversalLinks/xcodeassociateddomains.png">
 <meta property="article:published_time" content="2020-03-30T09:45:03.000Z">
-<meta property="article:modified_time" content="2020-03-31T06:52:53.487Z">
+<meta property="article:modified_time" content="2020-05-13T03:07:02.429Z">
 <meta property="article:author" content="Ma QianZheng">
 <meta property="article:tag" content="UniversalLinks iOS">
 <meta name="twitter:card" content="summary">
@@ -80,6 +80,8 @@
     <br/>
     <span id="actions">
       <ul>
+        
+        <li><a class="icon" href="/2020/04/10/In-App-Purchase/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
         
         
         <li><a class="icon" href="/2020/03/04/GCD%E5%9F%BA%E7%A1%80/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
@@ -171,17 +173,17 @@
 </ol>
 </li>
 </ul>
-<p>比如你<code>Team ID</code>是<code>ASDFG12345</code>，<code>Bundle ID</code>是<code>com.yunchang.game</code>，只在<br>访问<code>https://www.yunchang.com/app/</code>链接时才显示顶部的用app打开，其他网站层次不显示，那么这个文件的内容就是</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;applinks&quot;: &#123;</span><br><span class="line">        &quot;apps&quot;: [],</span><br><span class="line">        &quot;details&quot;: [</span><br><span class="line">            &#123;</span><br><span class="line">                &quot;appID&quot;: &quot;ASDFG12345.com.yunchang.game&quot;,</span><br><span class="line">                &quot;paths&quot;: [ &quot;&#x2F;app&#x2F;*&quot;]</span><br><span class="line">            &#125;</span><br><span class="line">        ]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>比如你<code>Team ID</code>是<code>ASDFG12345</code>，<code>Bundle ID</code>是<code>com.marbu.blog</code>，只在<br>访问<code>https://www.aloha-marbu.com/app/</code>链接时才显示顶部的用app打开，其他网站层次不显示，那么这个文件的内容就是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;applinks&quot;: &#123;</span><br><span class="line">        &quot;apps&quot;: [],</span><br><span class="line">        &quot;details&quot;: [</span><br><span class="line">            &#123;</span><br><span class="line">                &quot;appID&quot;: &quot;ASDFG12345.com.marbu.blog&quot;,</span><br><span class="line">                &quot;paths&quot;: [ &quot;&#x2F;app&#x2F;*&quot;]</span><br><span class="line">            &#125;</span><br><span class="line">        ]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>然后将这个文件上传到网站根目录，或者在根目录新建一个名字为<code>.well-known</code>的子目录，然后把这个文件上传到这个子目录中。<strong>注意：网站域名必须支持https</strong></p>
-<h4 id="2-网站验证"><a href="#2-网站验证" class="headerlink" title="2.网站验证"></a>2.网站验证</h4><p>上传之后，可以访问<a href="https://search.developer.apple.com/appsearch-validation-tool/" target="_blank" rel="noopener">https://search.developer.apple.com/appsearch-validation-tool/</a>，苹果专门提供的验证工具，然后将域名网址填进去，例如<code>www.yunchang.com/</code>，然后点击测试。</p>
+<h4 id="2-网站验证"><a href="#2-网站验证" class="headerlink" title="2.网站验证"></a>2.网站验证</h4><p>上传之后，可以访问<a href="https://search.developer.apple.com/appsearch-validation-tool/" target="_blank" rel="noopener">https://search.developer.apple.com/appsearch-validation-tool/</a>，苹果专门提供的验证工具，然后将域名网址填进去，例如<code>www.aloha-marbu.com/</code>，然后点击测试。</p>
 <p><img src="applevalidation.png" alt=""></p>
 <h2 id="三、Xcode配置"><a href="#三、Xcode配置" class="headerlink" title="三、Xcode配置"></a>三、Xcode配置</h2><ol>
 <li>打开工程配置中的Associated Domains</li>
 </ol>
 <p><code>TARGETS</code> -&gt; <code>Your TARGET</code> -&gt; <code>Signing &amp; Capabilities</code> -&gt; <code>Associated Domains</code><br><img src="xcodeassociateddomains.png" alt=""><br>2. 添加网站域名</p>
-<p>网站域名以<code>applinks:</code>开头，后面是你放<code>apple-app-site-association</code>文件的域名，比如：<code>applinks:www.yunchang.com</code></p>
-<h2 id="四、测试"><a href="#四、测试" class="headerlink" title="四、测试"></a>四、测试</h2><p>一切配置完成之后，删除你的<code>App</code>（只有删除重装Apple才会从你的服务器请求你的配置文件）<br>在<code>Safari</code>中打开<code>域名/配置的path</code>，拿之前的例子就应该是<code>https://www.yunchang.com/app/</code>，然后页面往下拉，如果有有你<code>App</code>跳转相关信息，那么恭喜你成功了，没有也不要慌，确认配置无误的话，等一会再试试。</p>
+<p>网站域名以<code>applinks:</code>开头，后面是你放<code>apple-app-site-association</code>文件的域名，比如：<code>applinks:www.aloha-marbu.com</code></p>
+<h2 id="四、测试"><a href="#四、测试" class="headerlink" title="四、测试"></a>四、测试</h2><p>一切配置完成之后，删除你的<code>App</code>（只有删除重装Apple才会从你的服务器请求你的配置文件）<br>在<code>Safari</code>中打开<code>域名/配置的path</code>，拿之前的例子就应该是<code>https://www.aloha-marbu.com/app/</code>，然后页面往下拉，如果有有你<code>App</code>跳转相关信息，那么恭喜你成功了，没有也不要慌，确认配置无误的话，等一会再试试。</p>
 
   </div>
 </article>
